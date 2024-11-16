@@ -1,0 +1,212 @@
+npm install @react-navigation/native react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated
+npm install @react-navigation/stack
+npm install react-native-sqlite-storage
+
+#App.js
+
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import HomeScreen from './screens/HomeScreen';
+import RadarScreen from './screens/RadarScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import EmergencyMapScreen from './screens/EmergencyMapScreen';
+import SymptomsScreen from './screens/SymptomsScreen';
+
+const Stack = createStackNavigator();
+
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Radar" component={RadarScreen} />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="EmergencyMap" component={EmergencyMapScreen} />
+        <Stack.Screen name="Symptoms" component={SymptomsScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+
+export default function HomeScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>AM - Assistência Emergencial Mobile</Text>
+      <Button title="Começar" onPress={() => navigation.navigate('Profile')} />
+    </View>
+  );
+}
+
+#Tela Inicial (HomeScreen.js)
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eaf4fe',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+});
+
+#Tela de Perfil (ProfileScreen.js)
+
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+
+export default function ProfileScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Olá, Carla!</Text>
+      <Text>Como você está se sentindo hoje?</Text>
+      <View style={styles.buttons}>
+        <Button title="Péssimo" onPress={() => navigation.navigate('Symptoms')} />
+        <Button title="Ótimo" onPress={() => navigation.navigate('EmergencyMap')} />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  title: {
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  buttons: {
+    marginTop: 20,
+  },
+});
+
+#Tela do Radar de Emergência (RadarScreen.js)
+
+import React from 'react';
+import { View, Text, StyleSheet, Button } from 'react-native';
+
+export default function RadarScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Procurando ajuda mais próxima...</Text>
+      <Button title="Parar Radar" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eaf4fe',
+  },
+  text: {
+    fontSize: 18,
+    marginBottom: 20,
+  },
+});
+
+#Tela do Mapa de Emergências (EmergencyMapScreen.js)
+
+import React from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+
+export default function EmergencyMapScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Locais Recomendados:</Text>
+      <Button title="Ver Detalhes" onPress={() => navigation.goBack()} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+});
+
+#Tela de Sintomas (SymptomsScreen.js)
+
+import React from 'react';
+import { View, Text, StyleSheet, Button, CheckBox } from 'react-native';
+
+export default function SymptomsScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Selecione seus sintomas:</Text>
+      <CheckBox value={false} onValueChange={() => {}} />
+      <Text>Náusea</Text>
+      <CheckBox value={false} onValueChange={() => {}} />
+      <Text>Febre</Text>
+      <Button title="Próximo" onPress={() => navigation.navigate('Radar')} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 10,
+  },
+});
+
+import SQLite from 'react-native-sqlite-storage';
+
+const db = SQLite.openDatabase(
+  {
+    name: 'appDatabase.db',
+    location: 'default',
+  },
+  () => console.log('Database opened successfully'),
+  error => console.log(error)
+);
+
+export const createTable = () => {
+  db.transaction(tx => {
+    tx.executeSql(
+      'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, symptoms TEXT);',
+      [],
+      () => console.log('Table created successfully'),
+      error => console.log(error)
+    );
+  });
+};
+
+#Configuração do SQLite (database.js)
+
+export const insertUser = (name, symptoms) => {
+  db.transaction(tx => {
+    tx.executeSql(
+      'INSERT INTO users (name, symptoms) VALUES (?, ?);',
+      [name, symptoms],
+      () => console.log('User added successfully'),
+      error => console.log(error)
+    );
+  });
+};
+
+
+
